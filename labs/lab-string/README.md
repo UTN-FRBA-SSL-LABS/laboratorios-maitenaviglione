@@ -277,7 +277,7 @@ Los tests de `IsEmpty` ya están activos en `StringTest.c`. Corré `make test` y
 
 **P1** — `IsEmpty` podría haberse escrito también como `return s[0] == '\0'`. ¿Son equivalentes? ¿Por qué?
 
-> R:
+> R:Sí, son equivalentes porque tanto *s como s[0] acceden al primer carácter de la cadena. Ambas expresiones verifican si ese carácter es '\0', lo que indica que la cadena está vacía.
 
 ---
 
@@ -328,14 +328,14 @@ make test
 
 **P2** — ¿Qué hace `s + 1`? ¿Por qué avanza al siguiente carácter y no al siguiente byte?
 
-> R:
+> R:s + 1 desplaza el puntero a la siguiente posición de la cadena. Como s es un puntero a char, la aritmética de punteros avanza una posición del tipo apuntado. En este caso, cada char ocupa un byte, por lo que avanzar un carácter equivale a avanzar un byte.
 
 **P3** — Si llamaras a `GetLength(NULL)`, ¿qué pasaría? ¿Por qué las precondiciones del contrato dicen `s != NULL`?
 
-> R:
+> R:Si llamamos a GetLength(NULL), se produciría un comportamiento indefinido, posiblemente un error de segmentación, porque la función intenta acceder a la memoria mediante un puntero nulo. Por eso, la precondición s != NULL garantiza que el puntero sea válido antes de utilizarlo.
 
 ```
-GETLENGTH_PASA=
+GETLENGTH_PASA=SI
 ```
 _(escribí SI cuando todos los tests de GetLength pasen)_
 
@@ -367,7 +367,7 @@ El `while` termina cuando alguna de las dos cadenas llega a `'\0'`. Después dev
 
 **P4** — ¿Qué dos casos están mal cubiertos por `return 1`? Describí un ejemplo para cada uno.
 
-> R:
+> R:Los dos casos son cuando la primera cadena termina antes que la segunda y cuando la segunda termina antes que la primera. Por ejemplo, AreEqual("hola", "holanda") y AreEqual("holanda", "hola"). En ambos casos, la función devolvía 1 incorrectamente, porque no verificaba que ambas cadenas terminaran al mismo tiempo.
 
 #### Corrección
 
@@ -384,7 +384,7 @@ make test
 ```
 
 ```
-AREEQUAL_PASA=
+AREEQUAL_PASA=SI
 ```
 _(escribí SI cuando todos los tests de AreEqual pasen)_
 
@@ -414,7 +414,7 @@ int AreDecimalDigits(const char *s) {
 
 **P5** — ¿Por qué la cadena vacía no debería considerarse un conjunto de dígitos decimales? Pensalo desde la especificación matemática.
 
-> R:
+> R:Porque, según la especificación matemática, una cadena válida de dígitos decimales debe contener al menos un carácter entre '0' y '9'. La cadena vacía no contiene ningún dígito, por lo tanto AreDecimalDigits("") debe devolver 0.
 
 #### Corrección
 
@@ -425,7 +425,7 @@ make test
 ```
 
 ```
-AREDECIMALDIGITS_PASA=
+AREDECIMALDIGITS_PASA=SI
 ```
 _(escribí SI cuando todos los tests de AreDecimalDigits pasen)_
 
@@ -467,7 +467,7 @@ Antes de implementar, discutí con tu equipo:
 
 **P6** — Conclusión de la discusión:
 
-> R:
+> R:Es correcto tener ToInteger en un módulo separado llamado Conversion, porque su responsabilidad es convertir una cadena a un número entero, mientras que la biblioteca String se encarga de realizar operaciones sobre cadenas. Esta separación permite organizar mejor el código y mantener cada módulo con una responsabilidad específica.
 
 ---
 
@@ -494,7 +494,7 @@ int ToInteger(const char *s) {
 
 **P7** — El loop acumula correctamente el valor en `resultado`. ¿Qué está mal en el `return`?
 
-> R:
+> R:El error es que return signo devuelve únicamente 1 o -1, según el signo del número, en lugar del valor convertido. Lo correcto es return signo * resultado, para devolver el número entero con su signo correspondiente.
 
 #### Corrección
 
@@ -506,10 +506,10 @@ make test
 
 **P8** — La expresión `*s - '0'` convierte un carácter dígito al entero correspondiente. ¿Por qué funciona? ¿Qué devuelve `'3' - '0'`?
 
-> R:
+> R:Funciona porque los caracteres numéricos del '0' al '9' tienen códigos consecutivos en la tabla ASCII. Al restar el código de '0' al de cualquier dígito, obtenemos su valor numérico. Por ejemplo, '3' - '0' devuelve 3, porque 51 - 48 = 3.
 
 ```
-TOINTEGER_PASA=
+TOINTEGER_PASA=SI
 ```
 _(escribí SI cuando todos los tests de ToInteger pasen)_
 
@@ -562,7 +562,7 @@ foo
 
 **P9** — ¿Por qué `(void)argc` suprime un warning? ¿Cuándo sería necesario usar `argc`?
 
-> R:
+> R:(void)argc indica al compilador que el parámetro argc no se utiliza intencionalmente, evitando una advertencia por variable sin usar. Sería necesario utilizar argc cuando queremos conocer la cantidad de argumentos recibidos, por ejemplo, para verificar que el usuario ingresó suficientes argumentos.
 
 ---
 
@@ -589,7 +589,7 @@ Salida esperada:
 ```
 
 ```
-LONGITUDES_PASA=
+LONGITUDES_PASA=SI
 ```
 _(SI o NO)_
 
@@ -616,7 +616,7 @@ make mayorlongitud
 ```
 
 ```
-MAYORLONGITUD_PASA=
+MAYORLONGITUD_PASA=SI
 ```
 _(SI o NO)_
 
@@ -635,7 +635,7 @@ make todosiguales
 ```
 
 ```
-TODOSIGUALES_PASA=
+TODOSIGUALES_PASA=SI
 ```
 _(SI o NO)_
 
@@ -652,7 +652,7 @@ make suma
 ```
 
 ```
-SUMA_PASA=
+SUMA_PASA=SI
 ```
 _(SI o NO)_
 
@@ -662,15 +662,15 @@ _(SI o NO)_
 
 **P10** — `GetLength` es recursiva pero en C una llamada recursiva consume un stack frame. Si llamaras `GetLength` con un string de 1.000.000 de caracteres, ¿qué pasaría? ¿Cómo lo resolverías?
 
-> R:
+> R:Al ser recursiva, la función realizaría una llamada por cada carácter, consumiendo mucha memoria de la pila y pudiendo provocar un desbordamiento (stack overflow). Para solucionarlo, implementaría GetLength de forma iterativa, utilizando un ciclo while y un contador, evitando las llamadas recursivas.
 
 **P11** — En la Parte III, todos los programas usan `char **arg` para iterar en vez de un índice entero. ¿Qué ventaja tiene este estilo? ¿Cuándo sería preferible usar el índice?
 
-> R:
+> R:Utilizar char **arg permite recorrer directamente los argumentos mediante punteros, sin necesidad de utilizar un índice ni consultar argc. Es preferible usar un índice cuando necesitamos acceder a una posición específica o conocer el número de argumento que estamos procesando.
 
 **P12** — En C, `"hola"` es un literal de tipo `const char *`. Si intentaras modificar un carácter con `s[0] = 'H'`, el comportamiento es indefinido. ¿Por qué? ¿En qué parte de la memoria viven los literales?
 
-> R:
+> R:Porque los literales de cadena se almacenan en memoria estática, generalmente en una zona de solo lectura. Intentar modificar su contenido produce un comportamiento indefinido, ya que esa memoria no está destinada a ser modificada.
 
 ---
 
